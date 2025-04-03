@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>第4課～第6課 自選單字練習</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", sans-serif;
+      background-color: #ffe4f0;
+      color: #333;
+      padding: 20px;
+      text-align: center;
+    }
+    .lesson {
+      background: #fff0f5;
+      padding: 10px;
+      margin: 20px auto;
+      width: fit-content;
+      border-radius: 12px;
+      text-align: left;
+    }
+    .lesson h3 {
+      margin-top: 0;
+    }
+    .option-button {
+      background-color: #fff;
+      margin: 5px;
+      padding: 10px 20px;
+      border: 2px solid #ff99cc;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button {
+      padding: 10px 16px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #ffccdd;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    #question {
+      font-size: 22px;
+      margin: 20px 0;
+    }
+    #quizArea {
+      margin-top: 30px;
+      padding: 20px;
+      background: #fffafc;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>第4～6課 自選單字練習</h1>
+
+  <div>
+    題目方向：
+    <select id="modeSelect" onchange="changeMode()">
+      <option value="jpToZh">日文 ➡ 中文（預設）</option>
+      <option value="zhToJp">中文 ➡ 日文</option>
+    </select>
+  </div>
+
+  <div>
+    題型選擇：
+    <select id="typeSelect" onchange="changeType()">
+      <option value="choice">選擇題（預設）</option>
+      <option value="input">打字題</option>
+    </select>
+  </div>
+
+  <div>
+    選擇課次：
+    <select id="lessonSelect" onchange="updateWordList()">
+      <option value="">-- 請選擇課次 --</option>
+      <option value="第4課">第4課</option>
+      <option value="第5課">第5課</option>
+      <option value="第6課">第6課</option>
+    </select>
+  </div>
+
+  <div id="wordSelection"></div>
+
+  <button onclick="startQuiz()">▶️ 開始測驗</button>
+  <button onclick="unlockSelection()">🔁 重新選單字</button>
+
+  <div id="quizArea">
+    <div id="question">← 點上方按鈕開始練習</div>
+    <div id="options"></div>
+    <div id="result"></div>
+    <div>
+      分數：<span id="score">0</span><br>
+      最高分：<span id="highscore">0</span><br>
+      答對率：<span id="accuracy">0%</span>（<span id="correct">0</span> / <span id="total">0</span> 題）
+    </div>
+    <button onclick="speakWord()">🔊 朗讀日文</button>
+    <button onclick="resetScore()">🔁 重置分數</button>
+  </div>
+
+  <div id="endScreen" style="display: none; margin-top: 20px; text-align: center;">
+    <h3>🎉 測驗完成！</h3>
+    <p>你的總得分是：<span id="finalScore">0</span> 分</p>
+    <button onclick="goHome()">🔙 回首頁</button>
+  </div>
+
+  <script src="lesson4to6-data.js"></script>
+  <script src="lesson4to6-logic.js"></script>
+</body>
+</html>
