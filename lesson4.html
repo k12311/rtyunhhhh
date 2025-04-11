@@ -80,6 +80,9 @@
     選擇課次：
     <select id="lessonSelect" onchange="updateWordList()">
       <option value="">-- 請選擇課次 --</option>
+      <option value="第1課">第1課</option>
+      <option value="第2課">第2課</option>
+      <option value="第3課">第3課</option>
       <option value="第4課">第4課</option>
       <option value="第5課">第5課</option>
       <option value="第6課">第6課</option>
@@ -118,6 +121,7 @@
 
   <script>
     const allLessons = {
+      
       "第4課": [
         { jp: "起きます", zh: "起床" }, { jp: "寝ます", zh: "睡覺" }, { jp: "働きます", zh: "工作" },
         { jp: "休みます", zh: "休息" }, { jp: "勉強します", zh: "讀書、學習" }, { jp: "終わります", zh: "結束" },
