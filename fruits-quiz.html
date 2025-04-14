@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>韓文水果單字練習</title>
+  <title>飲食單字練習</title>
   <style>
     body {
       font-family: "Helvetica Neue", sans-serif;
@@ -14,6 +14,8 @@
     }
     h1 {
       color: #ff66b2;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
     .btn, select, input {
       padding: 10px 16px;
@@ -21,10 +23,10 @@
       border: none;
       border-radius: 8px;
       font-size: 16px;
+      cursor: pointer;
     }
     .btn {
       background-color: #ffc1e3;
-      cursor: pointer;
     }
     .option {
       display: inline-block;
@@ -40,7 +42,8 @@
   </style>
 </head>
 <body>
-  <h1>🍇 韓文水果單字練習</h1>
+  <h1>🍎 飲食單字練習</h1>
+  
   <label>題型選擇：</label>
   <select id="modeSelect">
     <option value="choice">選擇題</option>
@@ -56,12 +59,13 @@
     <input type="text" id="typingInput" placeholder="輸入韓文">
     <button class="btn" onclick="checkTyping()">確認</button>
   </div>
-
+  
   <p id="result"></p>
   <button class="btn" onclick="nextQuestion()">下一題</button>
   <p id="score"></p>
-
+  
   <script>
+    // 飲食單字，此處以水果類單字作為範例
     const fruits = [
       { zh: "香蕉", ko: "바나나" },
       { zh: "蘋果", ko: "사과" },
@@ -79,26 +83,27 @@
       { zh: "哈密瓜", ko: "멜론" },
       { zh: "櫻桃", ko: "체리" }
     ];
-
-    let current, currentKorean = "", score = 0, total = 0, wrongList = [];
-
+    
+    let current, currentKorean = "";
+    let score = 0, total = 0, wrongList = [];
+    
     function shuffle(arr) {
       return arr.sort(() => Math.random() - 0.5);
     }
-
+    
     function speak(text) {
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = "ko-KR";
       speechSynthesis.speak(utter);
     }
-
+    
     function loadQuestion() {
       const mode = document.getElementById("modeSelect").value;
       document.getElementById("result").textContent = "";
       current = fruits[Math.floor(Math.random() * fruits.length)];
       currentKorean = current.ko;
       document.getElementById("question").textContent = `「${current.zh}」的韓文是？`;
-
+      
       if (mode === "choice") {
         document.getElementById("choiceArea").style.display = "block";
         document.getElementById("typingArea").style.display = "none";
@@ -121,7 +126,7 @@
         document.getElementById("typingInput").value = "";
       }
     }
-
+    
     function checkChoice(btn, answer) {
       const buttons = document.querySelectorAll(".option");
       buttons.forEach(b => b.disabled = true);
@@ -137,7 +142,7 @@
       total++;
       updateScore();
     }
-
+    
     function checkTyping() {
       const input = document.getElementById("typingInput").value.trim();
       if (input === current.ko) {
@@ -150,15 +155,15 @@
       total++;
       updateScore();
     }
-
+    
     function updateScore() {
       document.getElementById("score").textContent = `目前得分：${score} / ${total}（正確率 ${(score/total*100).toFixed(1)}%）`;
     }
-
+    
     function nextQuestion() {
       loadQuestion();
     }
-
+    
     function resetQuiz() {
       score = 0;
       total = 0;
@@ -166,7 +171,7 @@
       updateScore();
       loadQuestion();
     }
-
+    
     loadQuestion();
   </script>
 </body>
