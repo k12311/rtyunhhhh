@@ -185,7 +185,8 @@
       const mode = document.getElementById("mode").value;
       current = selectedWords[Math.floor(Math.random() * selectedWords.length)];
       currentKorean = current.ko;
-      document.getElementById("question").innerHTML = `🍙 <b>${current.zh}</b><br><span style="font-size: 1.5em;">${current.ko}</span>`;
+     document.getElementById("question").innerHTML = `🍙 <b>${current.zh}</b>`;
+
 
       if (mode === "choice") {
         document.getElementById("typingArea").style.display = "none";
