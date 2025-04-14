@@ -1,116 +1,174 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>第4課～第6課 自選單字練習</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>韓文水果單字練習</title>
   <style>
     body {
       font-family: "Helvetica Neue", sans-serif;
-      background-color: #ffe4f0;
+      background-color: #fff0f5;
       color: #333;
       padding: 20px;
       text-align: center;
     }
-    .lesson {
-      background: #fff0f5;
-      padding: 10px;
-      margin: 20px auto;
-      width: fit-content;
-      border-radius: 12px;
-      text-align: left;
+    h1 {
+      color: #ff66b2;
     }
-    .lesson h3 {
-      margin-top: 0;
+    .btn, select, input {
+      padding: 10px 16px;
+      margin: 8px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
     }
-    .option-button {
-      background-color: #fff;
+    .btn {
+      background-color: #ffc1e3;
+      cursor: pointer;
+    }
+    .option {
+      display: inline-block;
       margin: 5px;
       padding: 10px 20px;
       border: 2px solid #ff99cc;
       border-radius: 12px;
-      font-size: 16px;
+      background: #fff;
       cursor: pointer;
     }
-    button {
-      padding: 10px 16px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      background-color: #ffccdd;
-      cursor: pointer;
-    }
-    #result {
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    #question {
-      font-size: 22px;
-      margin: 20px 0;
-    }
-    #quizArea {
-      margin-top: 30px;
-      padding: 20px;
-      background: #fffafc;
-      border-radius: 12px;
-    }
+    .correct { background-color: #c6f6c6 !important; }
+    .wrong { background-color: #ffcccc !important; }
   </style>
 </head>
 <body>
-  <h1>第4～6課 自選單字練習</h1>
-
-  <div>
-    題目方向：
-    <select id="modeSelect" onchange="changeMode()">
-      <option value="jpToZh">日文 ➡ 中文（預設）</option>
-      <option value="zhToJp">中文 ➡ 日文</option>
-    </select>
+  <h1>🍇 韓文水果單字練習</h1>
+  <label>題型選擇：</label>
+  <select id="modeSelect">
+    <option value="choice">選擇題</option>
+    <option value="typing">打字題</option>
+  </select>
+  <button class="btn" onclick="resetQuiz()">重新開始</button>
+  
+  <h2 id="question">題目載入中...</h2>
+  <button class="btn" onclick="speak(currentKorean)">🔊 朗讀韓文</button>
+  
+  <div id="choiceArea"></div>
+  <div id="typingArea" style="display:none;">
+    <input type="text" id="typingInput" placeholder="輸入韓文">
+    <button class="btn" onclick="checkTyping()">確認</button>
   </div>
 
-  <div>
-    題型選擇：
-    <select id="typeSelect" onchange="changeType()">
-      <option value="choice">選擇題（預設）</option>
-      <option value="input">打字題</option>
-    </select>
-  </div>
+  <p id="result"></p>
+  <button class="btn" onclick="nextQuestion()">下一題</button>
+  <p id="score"></p>
 
-  <div>
-    選擇課次：
-    <select id="lessonSelect" onchange="updateWordList()">
-      <option value="">-- 請選擇課次 --</option>
-      <option value="第4課">第4課</option>
-      <option value="第5課">第5課</option>
-      <option value="第6課">第6課</option>
-    </select>
-  </div>
+  <script>
+    const fruits = [
+      { zh: "香蕉", ko: "바나나" },
+      { zh: "蘋果", ko: "사과" },
+      { zh: "葡萄", ko: "포도" },
+      { zh: "柳橙", ko: "오렌지" },
+      { zh: "草莓", ko: "딸기" },
+      { zh: "西瓜", ko: "수박" },
+      { zh: "桃子", ko: "복숭아" },
+      { zh: "李子", ko: "자두" },
+      { zh: "鳳梨", ko: "파인애플" },
+      { zh: "檸檬", ko: "레몬" },
+      { zh: "奇異果", ko: "키위" },
+      { zh: "芒果", ko: "망고" },
+      { zh: "柿子", ko: "감" },
+      { zh: "哈密瓜", ko: "멜론" },
+      { zh: "櫻桃", ko: "체리" }
+    ];
 
-  <div id="wordSelection"></div>
+    let current, currentKorean = "", score = 0, total = 0, wrongList = [];
 
-  <button onclick="startQuiz()">▶️ 開始測驗</button>
-  <button onclick="unlockSelection()">🔁 重新選單字</button>
+    function shuffle(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
 
-  <div id="quizArea">
-    <div id="question">← 點上方按鈕開始練習</div>
-    <div id="options"></div>
-    <div id="result"></div>
-    <div>
-      分數：<span id="score">0</span><br>
-      最高分：<span id="highscore">0</span><br>
-      答對率：<span id="accuracy">0%</span>（<span id="correct">0</span> / <span id="total">0</span> 題）
-    </div>
-    <button onclick="speakWord()">🔊 朗讀日文</button>
-    <button onclick="resetScore()">🔁 重置分數</button>
-  </div>
+    function speak(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = "ko-KR";
+      speechSynthesis.speak(utter);
+    }
 
-  <div id="endScreen" style="display: none; margin-top: 20px; text-align: center;">
-    <h3>🎉 測驗完成！</h3>
-    <p>你的總得分是：<span id="finalScore">0</span> 分</p>
-    <button onclick="goHome()">🔙 回首頁</button>
-  </div>
+    function loadQuestion() {
+      const mode = document.getElementById("modeSelect").value;
+      document.getElementById("result").textContent = "";
+      current = fruits[Math.floor(Math.random() * fruits.length)];
+      currentKorean = current.ko;
+      document.getElementById("question").textContent = `「${current.zh}」的韓文是？`;
 
-  <script src="lesson4to6-data.js"></script>
-  <script src="lesson4to6-logic.js"></script>
+      if (mode === "choice") {
+        document.getElementById("choiceArea").style.display = "block";
+        document.getElementById("typingArea").style.display = "none";
+        const choices = shuffle([
+          current.ko,
+          ...shuffle(fruits.map(f => f.ko).filter(k => k !== current.ko)).slice(0, 3)
+        ]);
+        const area = document.getElementById("choiceArea");
+        area.innerHTML = "";
+        choices.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.className = "option";
+          btn.textContent = opt;
+          btn.onclick = () => checkChoice(btn, opt);
+          area.appendChild(btn);
+        });
+      } else {
+        document.getElementById("choiceArea").style.display = "none";
+        document.getElementById("typingArea").style.display = "block";
+        document.getElementById("typingInput").value = "";
+      }
+    }
+
+    function checkChoice(btn, answer) {
+      const buttons = document.querySelectorAll(".option");
+      buttons.forEach(b => b.disabled = true);
+      if (answer === current.ko) {
+        btn.classList.add("correct");
+        document.getElementById("result").textContent = "✅ 答對了！";
+        score++;
+      } else {
+        btn.classList.add("wrong");
+        document.getElementById("result").textContent = `❌ 錯了，正確是：${current.ko}`;
+        wrongList.push(current);
+      }
+      total++;
+      updateScore();
+    }
+
+    function checkTyping() {
+      const input = document.getElementById("typingInput").value.trim();
+      if (input === current.ko) {
+        document.getElementById("result").textContent = "✅ 答對了！";
+        score++;
+      } else {
+        document.getElementById("result").textContent = `❌ 錯了，正確是：${current.ko}`;
+        wrongList.push(current);
+      }
+      total++;
+      updateScore();
+    }
+
+    function updateScore() {
+      document.getElementById("score").textContent = `目前得分：${score} / ${total}（正確率 ${(score/total*100).toFixed(1)}%）`;
+    }
+
+    function nextQuestion() {
+      loadQuestion();
+    }
+
+    function resetQuiz() {
+      score = 0;
+      total = 0;
+      wrongList = [];
+      updateScore();
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
 </body>
 </html>
+
