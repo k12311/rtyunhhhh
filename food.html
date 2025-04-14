@@ -44,6 +44,9 @@
       border-radius: 8px;
       font-size: 15px;
     }
+    #quizArea {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -62,21 +65,25 @@
       <option value="choice">選擇題</option>
       <option value="typing">打字題</option>
     </select>
+  </div>
+
+  <button onclick="startQuiz()">開始測驗</button>
+
+  <div id="quizArea">
+    <h2 id="question">請選擇單字開始練習</h2>
+    <button onclick="speak(currentKorean)">🔊 朗讀</button>
+
+    <div id="choiceArea"></div>
+    <div id="typingArea" style="display:none;">
+      <input type="text" id="typingInput" placeholder="請輸入正確的韓文">
+      <button onclick="checkTyping()">確認</button>
+    </div>
+
+    <p id="result"></p>
+    <button onclick="nextQuestion()">下一題</button>
     <button onclick="resetQuiz()">重新開始</button>
+    <p id="score"></p>
   </div>
-
-  <h2 id="question">請選擇單字開始練習</h2>
-  <button onclick="speak(currentKorean)">🔊 朗讀</button>
-
-  <div id="choiceArea"></div>
-  <div id="typingArea" style="display:none;">
-    <input type="text" id="typingInput" placeholder="請輸入正確的韓文">
-    <button onclick="checkTyping()">確認</button>
-  </div>
-
-  <p id="result"></p>
-  <button onclick="nextQuestion()">下一題</button>
-  <p id="score"></p>
 
   <script>
     const words = [
@@ -121,6 +128,11 @@
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = "ko-KR";
       speechSynthesis.speak(utter);
+    }
+
+    function startQuiz() {
+      document.getElementById("quizArea").style.display = "block";
+      loadQuestion();
     }
 
     function loadQuestion() {
@@ -185,25 +197,8 @@
     }
 
     function updateScore() {
-      document.getElementById("score").textContent = `得分：${score} / ${total}（正確率 ${(score/total*100).toFixed(1)}%）`;
-    }
+      document.getElementById("
 
-    function nextQuestion() {
-      loadQuestion();
-    }
-
-    function resetQuiz() {
-      score = 0;
-      total = 0;
-      updateScore();
-      loadQuestion();
-    }
-
-    createWordList();
-    loadQuestion();
-  </script>
-</body>
-</html>
 
 
 
