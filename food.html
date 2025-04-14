@@ -159,7 +159,67 @@
         ]);
         const area = document.getElementById("choiceArea");
         area.innerHTML = "";
-        area.style.display = "
+        area.style.display = "block";
+        choices.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.className = "option";
+          btn.textContent = opt;
+          btn.onclick = () => checkChoice(btn, opt);
+          area.appendChild(btn);
+        });
+      } else {
+        document.getElementById("choiceArea").style.display = "none";
+        document.getElementById("typingArea").style.display = "block";
+        document.getElementById("typingInput").value = "";
+      }
+    }
+
+    function checkChoice(btn, answer) {
+      document.querySelectorAll(".option").forEach(b => b.disabled = true);
+      if (answer === current.ko) {
+        btn.classList.add("correct");
+        document.getElementById("result").textContent = "✅ 正確！";
+        score++;
+      } else {
+        btn.classList.add("wrong");
+        document.getElementById("result").textContent = `❌ 錯了，正確是：${current.ko}`;
+      }
+      total++;
+      updateScore();
+    }
+
+    function checkTyping() {
+      const input = document.getElementById("typingInput").value.trim();
+      if (input === current.ko) {
+        document.getElementById("result").textContent = "✅ 正確！";
+        score++;
+      } else {
+        document.getElementById("result").textContent = `❌ 錯了，正確是：${current.ko}`;
+      }
+      total++;
+      updateScore();
+    }
+
+    function updateScore() {
+      document.getElementById("score").textContent = `得分：${score} / ${total}（正確率 ${(score/total*100).toFixed(1)}%）`;
+    }
+
+    function nextQuestion() {
+      loadQuestion();
+    }
+
+    function resetQuiz() {
+      score = 0;
+      total = 0;
+      updateScore();
+      loadQuestion();
+    }
+
+    createWordList();
+  </script>
+</body>
+</html>
+
 
 
 
