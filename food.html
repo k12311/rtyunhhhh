@@ -13,12 +13,33 @@
       padding: 20px;
     }
     h1 { color: #ff66b2; }
+    .category {
+      margin: 20px 0;
+      padding: 10px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .word-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .word-item {
+      margin: 5px;
+      background: #ffe6f0;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 15px;
+    }
     button, select, input {
       padding: 10px 16px;
-      margin: 10px;
+      margin: 6px;
       font-size: 16px;
       border-radius: 10px;
       border: none;
+      cursor: pointer;
     }
     .option {
       background: #fff;
@@ -27,58 +48,56 @@
       padding: 10px 20px;
       border-radius: 12px;
       font-size: 16px;
-      cursor: pointer;
     }
     .correct { background-color: #c8f7c5 !important; }
     .wrong { background-color: #ffc1c1 !important; }
-    .word-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    .word-item {
-      margin: 4px 6px;
-      background: #ffe6f0;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-    #quizArea {
-      display: none;
-    }
+    #quizArea { display: none; }
   </style>
 </head>
 <body>
   <h1>🍱 飲食類 韓文單字練習</h1>
 
-  <div id="selectButtons">
-    <button onclick="selectAll(true)">全選</button>
-    <button onclick="selectAll(false)">全取消</button>
+  <!-- 分類區 -->
+  <div id="selectionArea">
+    <div class="category">
+      <h3>🥦 蔬菜類 <button onclick="toggleGroup('veggies', true)">全選</button><button onclick="toggleGroup('veggies', false)">取消</button></h3>
+      <div class="word-list" id="veggiesList"></div>
+    </div>
+
+    <div class="category">
+      <h3>🍎 水果類 <button onclick="toggleGroup('fruits', true)">全選</button><button onclick="toggleGroup('fruits', false)">取消</button></h3>
+      <div class="word-list" id="fruitsList"></div>
+    </div>
+
+    <div class="category">
+      <h3>🚚 動詞類 <button onclick="toggleGroup('verbs', true)">全選</button><button onclick="toggleGroup('verbs', false)">取消</button></h3>
+      <div class="word-list" id="verbsList"></div>
+    </div>
+
+    <div class="category">
+      <h3>✨ 形容詞類 <button onclick="toggleGroup('adjectives', true)">全選</button><button onclick="toggleGroup('adjectives', false)">取消</button></h3>
+      <div class="word-list" id="adjectivesList"></div>
+    </div>
+
+    <div>
+      <label>題型：</label>
+      <select id="mode">
+        <option value="choice">選擇題</option>
+        <option value="typing">打字題</option>
+      </select>
+      <button onclick="startQuiz()">開始測驗</button>
+    </div>
   </div>
 
-  <div class="word-list" id="wordList"></div>
-
-  <div id="modeSelect">
-    <label>題型：</label>
-    <select id="mode">
-      <option value="choice">選擇題</option>
-      <option value="typing">打字題</option>
-    </select>
-  </div>
-
-  <button id="startBtn" onclick="startQuiz()">開始測驗</button>
-
+  <!-- 測驗區 -->
   <div id="quizArea">
-    <h2 id="question">請選擇單字開始練習</h2>
+    <h2 id="question">題目載入中...</h2>
     <button onclick="speak(currentKorean)">🔊 朗讀</button>
-
     <div id="choiceArea"></div>
     <div id="typingArea" style="display:none;">
       <input type="text" id="typingInput" placeholder="請輸入正確的韓文">
       <button onclick="checkTyping()">確認</button>
     </div>
-
     <p id="result"></p>
     <button onclick="nextQuestion()">下一題</button>
     <button onclick="resetQuiz()">重新開始</button>
@@ -86,43 +105,58 @@
   </div>
 
   <script>
-    const words = [
-       { zh: "小黃瓜", ko: "오이" },
-      { zh: "番茄", ko: "토마토" },
-      { zh: "胡蘿蔔", ko: "당근" },
-      { zh: "馬鈴薯", ko: "감자" },
-      { zh: "地瓜", ko: "고구마" },
-      { zh: "南瓜", ko: "호박" },
-      { zh: "茄子", ko: "가지" },
-      { zh: "蘑菇", ko: "버섯" },
-      { zh: "高麗菜", ko: "양배추" },
-      { zh: "白菜", ko: "배추" },
-      { zh: "生菜", ko: "상추" },
-      { zh: "蔥", ko: "파" },
-      { zh: "大蒜", ko: "마늘" },
-      { zh: "洋蔥", ko: "양파" },
-      { zh: "辣椒", ko: "고추" }
+    const veggies = [
+      { zh: "小黃瓜", ko: "오이" }, { zh: "番茄", ko: "토마토" }, { zh: "胡蘿蔔", ko: "당근" },
+      { zh: "馬鈴薯", ko: "감자" }, { zh: "地瓜", ko: "고구마" }, { zh: "南瓜", ko: "호박" },
+      { zh: "茄子", ko: "가지" }, { zh: "蘑菇", ko: "버섯" }, { zh: "高麗菜", ko: "양배추" },
+      { zh: "白菜", ko: "배추" }, { zh: "生菜", ko: "상추" }, { zh: "蔥", ko: "파" },
+      { zh: "大蒜", ko: "마늘" }, { zh: "洋蔥", ko: "양파" }, { zh: "辣椒", ko: "고추" }
     ];
-    let current = null, currentKorean = "", score = 0, total = 0;
+    const fruits = [
+      { zh: "香蕉", ko: "바나나" }, { zh: "蘋果", ko: "사과" }, { zh: "葡萄", ko: "포도" },
+      { zh: "柳橙", ko: "오렌지" }, { zh: "草莓", ko: "딸기" }, { zh: "西瓜", ko: "수박" },
+      { zh: "桃子", ko: "복숭아" }, { zh: "李子", ko: "자두" }, { zh: "鳳梨", ko: "파인애플" },
+      { zh: "檸檬", ko: "레몬" }, { zh: "奇異果", ko: "키위" }, { zh: "芒果", ko: "망고" },
+      { zh: "柿子", ko: "감" }, { zh: "哈密瓜", ko: "멜론" }, { zh: "櫻桃", ko: "체리" }
+    ];
+    const verbs = [
+      { zh: "賣", ko: "팔다" }, { zh: "買", ko: "사다" }, { zh: "販賣", ko: "판매하다" },
+      { zh: "配送", ko: "배송하다" }, { zh: "討價還價", ko: "흥정하다" }, { zh: "秤重", ko: "재다" }
+    ];
+    const adjectives = [
+      { zh: "貴的", ko: "비싸다" }, { zh: "便宜的", ko: "저렴하다" }, { zh: "新鮮的", ko: "신선하다" },
+      { zh: "新鮮的（活跳跳）", ko: "싱싱하다" }, { zh: "硬的", ko: "딱딱하다" }, { zh: "軟的", ko: "부드럽다" }
+    ];
 
-    function createWordList() {
-      const listEl = document.getElementById("wordList");
-      listEl.innerHTML = "";
-      words.forEach((w, i) => {
+    const categories = { veggies, fruits, verbs, adjectives };
+    let selectedWords = [], current, currentKorean = "", score = 0, total = 0;
+
+    function renderWords(category, listId) {
+      const container = document.getElementById(listId);
+      container.innerHTML = "";
+      category.forEach((w, i) => {
         const label = document.createElement("label");
         label.className = "word-item";
-        label.innerHTML = `<input type="checkbox" value="${i}" checked> ${w.zh}（${w.ko}）`;
-        listEl.appendChild(label);
+        label.innerHTML = `<input type="checkbox" data-cat="${listId}" checked value="${w.ko}"> ${w.zh}（${w.ko}）`;
+        container.appendChild(label);
       });
     }
 
-    function getSelectedWords() {
-      const checks = document.querySelectorAll("#wordList input:checked");
-      return Array.from(checks).map(c => words[parseInt(c.value)]);
+    function toggleGroup(group, state) {
+      document.querySelectorAll(`#${group}List input`).forEach(cb => cb.checked = state);
     }
 
-    function selectAll(state) {
-      document.querySelectorAll("#wordList input").forEach(cb => cb.checked = state);
+    function getSelectedWords() {
+      const selected = [];
+      for (let key in categories) {
+        const items = categories[key];
+        const checks = document.querySelectorAll(`#${key}List input:checked`);
+        checks.forEach(cb => {
+          const word = items.find(w => w.ko === cb.value);
+          if (word) selected.push(word);
+        });
+      }
+      return selected;
     }
 
     function shuffle(arr) {
@@ -136,31 +170,28 @@
     }
 
     function startQuiz() {
+      selectedWords = getSelectedWords();
+      if (selectedWords.length === 0) {
+        alert("請至少選擇一個單字！");
+        return;
+      }
+      document.getElementById("selectionArea").style.display = "none";
       document.getElementById("quizArea").style.display = "block";
-      document.getElementById("wordList").style.display = "none";
-      document.getElementById("selectButtons").style.display = "none";
-      document.getElementById("modeSelect").style.display = "none";
-      document.getElementById("startBtn").style.display = "none";
       loadQuestion();
     }
 
     function loadQuestion() {
-      const list = getSelectedWords();
-      if (list.length === 0) {
-        document.getElementById("question").textContent = "請先選擇要練習的單字";
-        return;
-      }
       document.getElementById("result").textContent = "";
       const mode = document.getElementById("mode").value;
-      current = list[Math.floor(Math.random() * list.length)];
+      current = selectedWords[Math.floor(Math.random() * selectedWords.length)];
       currentKorean = current.ko;
-      document.getElementById("question").innerHTML = `🍓 <b>${current.zh}</b><br><span style="font-size: 1.5em;">${current.ko}</span>`;
+      document.getElementById("question").innerHTML = `🍙 <b>${current.zh}</b><br><span style="font-size: 1.5em;">${current.ko}</span>`;
 
       if (mode === "choice") {
         document.getElementById("typingArea").style.display = "none";
         const choices = shuffle([
           current.ko,
-          ...shuffle(words.map(w => w.ko).filter(k => k !== current.ko)).slice(0, 3)
+          ...shuffle(selectedWords.map(w => w.ko).filter(k => k !== current.ko)).slice(0, 3)
         ]);
         const area = document.getElementById("choiceArea");
         area.innerHTML = "";
@@ -220,10 +251,15 @@
       loadQuestion();
     }
 
-    createWordList();
+    // 初始化顯示
+    renderWords(veggies, "veggiesList");
+    renderWords(fruits, "fruitsList");
+    renderWords(verbs, "verbsList");
+    renderWords(adjectives, "adjectivesList");
   </script>
 </body>
 </html>
+
 
 
 
