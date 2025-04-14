@@ -197,7 +197,25 @@
     }
 
     function updateScore() {
-      document.getElementById("
+      document.getElementById("score").textContent = `得分：${score} / ${total}（正確率 ${(score/total*100).toFixed(1)}%）`;
+    }
+
+    function nextQuestion() {
+      loadQuestion();
+    }
+
+    function resetQuiz() {
+      score = 0;
+      total = 0;
+      updateScore();
+      loadQuestion();
+    }
+
+    createWordList();
+  </script>
+</body>
+</html>
+
 
 
 
