@@ -52,14 +52,14 @@
 <body>
   <h1>🍱 飲食類 韓文單字練習</h1>
 
-  <div>
+  <div id="selectButtons">
     <button onclick="selectAll(true)">全選</button>
     <button onclick="selectAll(false)">全取消</button>
   </div>
 
   <div class="word-list" id="wordList"></div>
 
-  <div>
+  <div id="modeSelect">
     <label>題型：</label>
     <select id="mode">
       <option value="choice">選擇題</option>
@@ -67,7 +67,7 @@
     </select>
   </div>
 
-  <button onclick="startQuiz()">開始測驗</button>
+  <button id="startBtn" onclick="startQuiz()">開始測驗</button>
 
   <div id="quizArea">
     <h2 id="question">請選擇單字開始練習</h2>
@@ -132,6 +132,10 @@
 
     function startQuiz() {
       document.getElementById("quizArea").style.display = "block";
+      document.getElementById("wordList").style.display = "none";
+      document.getElementById("selectButtons").style.display = "none";
+      document.getElementById("modeSelect").style.display = "none";
+      document.getElementById("startBtn").style.display = "none";
       loadQuestion();
     }
 
@@ -155,66 +159,8 @@
         ]);
         const area = document.getElementById("choiceArea");
         area.innerHTML = "";
-        area.style.display = "block";
-        choices.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.className = "option";
-          btn.textContent = opt;
-          btn.onclick = () => checkChoice(btn, opt);
-          area.appendChild(btn);
-        });
-      } else {
-        document.getElementById("choiceArea").style.display = "none";
-        document.getElementById("typingArea").style.display = "block";
-        document.getElementById("typingInput").value = "";
-      }
-    }
+        area.style.display = "
 
-    function checkChoice(btn, answer) {
-      document.querySelectorAll(".option").forEach(b => b.disabled = true);
-      if (answer === current.ko) {
-        btn.classList.add("correct");
-        document.getElementById("result").textContent = "✅ 正確！";
-        score++;
-      } else {
-        btn.classList.add("wrong");
-        document.getElementById("result").textContent = `❌ 錯了，正確是：${current.ko}`;
-      }
-      total++;
-      updateScore();
-    }
-
-    function checkTyping() {
-      const input = document.getElementById("typingInput").value.trim();
-      if (input === current.ko) {
-        document.getElementById("result").textContent = "✅ 正確！";
-        score++;
-      } else {
-        document.getElementById("result").textContent = `❌ 錯了，正確是：${current.ko}`;
-      }
-      total++;
-      updateScore();
-    }
-
-    function updateScore() {
-      document.getElementById("score").textContent = `得分：${score} / ${total}（正確率 ${(score/total*100).toFixed(1)}%）`;
-    }
-
-    function nextQuestion() {
-      loadQuestion();
-    }
-
-    function resetQuiz() {
-      score = 0;
-      total = 0;
-      updateScore();
-      loadQuestion();
-    }
-
-    createWordList();
-  </script>
-</body>
-</html>
 
 
 
